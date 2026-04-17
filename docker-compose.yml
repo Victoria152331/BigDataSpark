@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: hl_lab2_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bigdata_snowflake
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: 1111
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+      - ./исходные данные:/data
+
+  spark:
+    image: jupyter/pyspark-notebook:latest
+    container_name: hl_lab2_spark
+    ports:
+      - "8888:8888"
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - PYSPARK_SUBMIT_ARGS=--jars /home/jovyan/jars/postgresql-42.7.9.jar pyspark-shell
+    volumes:
+      - ./spark:/home/jovyan/work
+      - ./jars:/home/jovyan/jars
+    depends_on:
+      - postgres
+      - clickhouse
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: hl_lab2_clickhouse
+    ports:
+      - "8123:8123"   # HTTP
+      - "9000:9000"   # native protocol
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+
+volumes:
+  postgres_data:
+  clickhouse_data:
