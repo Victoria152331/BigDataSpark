@@ -21,7 +21,7 @@ services:
       - "8888:8888"
     environment:
       - JUPYTER_ENABLE_LAB=yes
-      - PYSPARK_SUBMIT_ARGS=--jars /home/jovyan/jars/postgresql-42.7.9.jar pyspark-shell
+      - PYSPARK_SUBMIT_ARGS=--jars /home/jovyan/jars/postgresql-42.7.9.jar,/home/jovyan/jars/clickhouse-jdbc-0.9.8-all.jar pyspark-shell
     volumes:
       - ./spark:/home/jovyan/work
       - ./jars:/home/jovyan/jars
@@ -35,6 +35,11 @@ services:
     ports:
       - "8123:8123"   # HTTP
       - "9000:9000"   # native protocol
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: 1234
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
     volumes:
       - clickhouse_data:/var/lib/clickhouse
 
